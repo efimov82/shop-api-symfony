@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Product;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -20,30 +21,16 @@ class AppFixtures extends Fixture
     foreach ($products as $id => $product) {
       $this->createProduct($manager, $product['name'], $product['description']);
     }
-    // $product = new Product();
-    // $product->setName('Tomato');
-    // $product->setDescription('Tomato from Asia');
-    // $product->setPrice(mt_rand(5, 50) / mt_rand(1, 10));
-    // $manager->persist($product);
 
-    // $product2 = new Product();
-    // $product2->setName('Potato');
-    // $product->setDescription('Fresh potato from Belarus');
-    // $product2->setPrice(round(mt_rand(5, 50) / mt_rand(1, 10), 2));
-    // $manager->persist($product2);
+    // Default user
+    $user = new User();
+    $user->setEmail('user@example.com');
 
-    // $product3 = new Product();
-    // $product3->setName('Onion');
-    // $product->setDescription('Fresh onion from Belarus');
-    // $product3->setPrice(mt_rand(5, 50) / mt_rand(1, 10));
-    // $manager->persist($product3);
-
-    // $product4 = new Product();
-    // $product4->setName('Apple');
-    // $product->setDescription('Apple from Bulgaria');
-    // $product4->setPrice(mt_rand(5, 50) / mt_rand(1, 10));
-    // $manager->persist($product4);
-
+    // use: php bin/console security:hash-password
+    // password: user
+    $user->setPassword('$2y$13$HynG6HO55eFSXOfSNhH3cuhZ5NtJ/srnEW6lJbDZjLGtgSis8Jqbm');
+    $user->setRoles(["ROLE_ADMIN", "ROLE_USER", "ROLE_MANAGER"]);
+    $manager->persist($user);
 
     $manager->flush();
   }
@@ -57,7 +44,5 @@ class AppFixtures extends Fixture
     $product->setDescription($description);
     $product->setPrice(mt_rand(5, 50) / mt_rand(1, 10));
     $manager->persist($product);
-
-    // return $product;
   }
 }
