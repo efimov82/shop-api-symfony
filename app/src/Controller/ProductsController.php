@@ -6,6 +6,7 @@ use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -17,9 +18,18 @@ class ProductsController extends AbstractController
     public function index(ProductRepository $productRepository, Request $request): JsonResponse
     {
         $page = $request->query->getInt('page', 1);
-        $products = $productRepository->findAll();
+        $limit = $request->query->getInt('limit', 10);
 
-        return $this->json($products);
+        $products = $productRepository->getPaginatedProducts($page, $limit);
+        $total = count($productRepository->findAll());
+
+        return $this->json(
+            $products,
+            Response::HTTP_OK,
+            [
+                "x-total-items" => $total
+            ]
+        );
     }
 
     #[Route('/products/{product}', name: '_details')]

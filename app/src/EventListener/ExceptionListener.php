@@ -17,7 +17,8 @@ class ExceptionListener
         // You get the exception object from the received event
         $exception = $event->getThrowable();
 
-        // var_dump($exception);
+        // TODO - check DEV environment for show details and Hide for Production
+        var_dump($exception->getMessage());
 
         $headers = $exception->getHeaders();
         $headers['Content-Type'] = 'application/json';
