@@ -2,8 +2,11 @@
 
 namespace App\Entity;
 
+use App\Entity\Order;
 use App\Repository\OrderItemRepository;
 use Doctrine\ORM\Mapping as ORM;
+
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: OrderItemRepository::class)]
 class OrderItem
@@ -11,23 +14,32 @@ class OrderItem
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['main'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['main'])]
     private ?int $order_id = null;
 
     #[ORM\Column]
+    #[Groups(['main'])]
     private ?int $product_id = null;
 
     #[ORM\Column]
+    #[Groups(['main'])]
     private ?int $count = null;
+
+    #[ORM\ManyToOne(inversedBy: 'OrderItems')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['extended'])]
+    private ?Order $OrderObj = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(string $id): static
+    public function setId(int $id): static
     {
         $this->id = $id;
 
@@ -66,6 +78,18 @@ class OrderItem
     public function setCount(int $count): static
     {
         $this->count = $count;
+
+        return $this;
+    }
+
+    public function getOrder(): ?Order
+    {
+        return $this->OrderObj;
+    }
+
+    public function setOrder(?Order $order): static
+    {
+        $this->OrderObj = $order;
 
         return $this;
     }

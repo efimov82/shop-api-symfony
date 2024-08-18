@@ -17,7 +17,7 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    public function getPaginatedProducts($page = 1, $postsPerPage = 9)
+    public function getPaginatedProducts(int $page = 1, int $postsPerPage = 9): Paginator
     {
         $query = $this->createQueryBuilder('a')
             ->orderBy('a.id', 'ASC')
