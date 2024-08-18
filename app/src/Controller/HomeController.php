@@ -8,8 +8,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use OpenApi\Attributes as OA;
 
 #[Route('/api/v1', name: 'home_api')]
+#[OA\Tag(name: 'Home API')]
 class HomeController extends AbstractController
 {
   #[Route('/home', name: '_index')]
