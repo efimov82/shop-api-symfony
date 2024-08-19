@@ -39,7 +39,7 @@ class OrderRepository extends ServiceEntityRepository
         $query = $entityManager->createQuery(
             'SELECT o, i
             FROM App\Entity\Order o
-            INNER JOIN o.OrderItems i
+            INNER JOIN o.OrderEntity i
             WHERE o.id = :id'
         )->setParameter('id', $id);
 
