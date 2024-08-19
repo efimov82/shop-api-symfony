@@ -20,8 +20,8 @@ class HomeController extends AbstractController
   {
     $token = $tokenStorage->getToken();
 
-    if ($token instanceof JWTPostAuthenticationToken) {
-
+    if ($token instanceof JWTPostAuthenticationToken) 
+    {
       $user = $token->getUser();
       $roles = $user->getRoles();
 

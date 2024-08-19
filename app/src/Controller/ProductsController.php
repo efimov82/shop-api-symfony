@@ -16,7 +16,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 // use Nelmio\ApiDocBundle\Annotation\Security;
 
 //use Swagger\Annotations as OA;
-// use OpenApi\Attributes as OA;
 use OpenApi\Attributes as OA;
 // use Nelmio\ApiDocBundle\Annotations as OA;
 

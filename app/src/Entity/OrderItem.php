@@ -29,10 +29,23 @@ class OrderItem
     #[Groups(['main'])]
     private ?int $count = null;
 
-    #[ORM\ManyToOne(inversedBy: 'OrderItems')]
+    #[ORM\ManyToOne(inversedBy: 'orderItems')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['extended'])]
-    private ?Order $OrderObj = null;
+    private ?Order $OrderEntity = null;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Product $Product = null;
+
+    // #[ORM\ManyToOne(inversedBy: 'OrderItems')]
+    // #[ORM\JoinColumn(nullable: false)]
+    // #[Groups(['extended'])]
+    // private ?Order $OrderObj = null;
+    private int $totalCost;
+
+    public function getTotalCost(): float {
+        return $this->Product->getPrice() * $this->count;;
+    }
 
     public function getId(): ?int
     {
@@ -82,14 +95,38 @@ class OrderItem
         return $this;
     }
 
-    public function getOrder(): ?Order
+    // public function getOrder(): ?Order
+    // {
+    //     return $this->OrderObj;
+    // }
+
+    // public function setOrder(?Order $order): static
+    // {
+    //     $this->OrderObj = $order;
+
+    //     return $this;
+    // }
+
+    public function getOrderEntity(): ?Order
     {
-        return $this->OrderObj;
+        return $this->OrderEntity;
     }
 
-    public function setOrder(?Order $order): static
+    public function setOrderEntity(?Order $OrderEntity): static
     {
-        $this->OrderObj = $order;
+        $this->OrderEntity = $OrderEntity;
+
+        return $this;
+    }
+
+    public function getProduct(): ?Product
+    {
+        return $this->Product;
+    }
+
+    public function setProduct(Product $Product): static
+    {
+        $this->Product = $Product;
 
         return $this;
     }

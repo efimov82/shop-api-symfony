@@ -41,13 +41,20 @@ class Order
     /**
      * @var Collection<int, OrderItem>
      */
-    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'OrderObj', orphanRemoval: true)]
-    #[Groups(['extended'])]
-    private Collection $OrderItems;
+    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'OrderEntity')]
+    private Collection $orderItems;
+
+    // /**
+    //  * @var Collection<int, OrderItem>
+    //  */
+    // #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'OrderObj', orphanRemoval: true)]
+    // #[Groups(['extended'])]
+    // private Collection $OrderItems;
 
     public function __construct()
     {
         $this->OrderItems = new ArrayCollection();
+        $this->orderItems = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -98,19 +105,49 @@ class Order
         return $this;
     }
 
+    // /**
+    //  * @return Collection<int, OrderItem>
+    //  */
+    // public function getOrderItems(): Collection
+    // {
+    //     return $this->OrderItems;
+    // }
+
+    // public function addOrderItem(OrderItem $orderItem): static
+    // {
+    //     if (!$this->OrderItems->contains($orderItem)) {
+    //         $this->OrderItems->add($orderItem);
+    //         $orderItem->setOrder($this);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removeOrderItem(OrderItem $orderItem): static
+    // {
+    //     if ($this->OrderItems->removeElement($orderItem)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($orderItem->getOrder() === $this) {
+    //             $orderItem->setOrder(null);
+    //         }
+    //     }
+
+    //     return $this;
+    // }
+
     /**
      * @return Collection<int, OrderItem>
      */
     public function getOrderItems(): Collection
     {
-        return $this->OrderItems;
+        return $this->orderItems;
     }
 
     public function addOrderItem(OrderItem $orderItem): static
     {
-        if (!$this->OrderItems->contains($orderItem)) {
-            $this->OrderItems->add($orderItem);
-            $orderItem->setOrder($this);
+        if (!$this->orderItems->contains($orderItem)) {
+            $this->orderItems->add($orderItem);
+            $orderItem->setOrderEntity($this);
         }
 
         return $this;
@@ -118,10 +155,10 @@ class Order
 
     public function removeOrderItem(OrderItem $orderItem): static
     {
-        if ($this->OrderItems->removeElement($orderItem)) {
+        if ($this->orderItems->removeElement($orderItem)) {
             // set the owning side to null (unless already changed)
-            if ($orderItem->getOrder() === $this) {
-                $orderItem->setOrder(null);
+            if ($orderItem->getOrderEntity() === $this) {
+                $orderItem->setOrderEntity(null);
             }
         }
 
