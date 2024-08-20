@@ -1,8 +1,6 @@
 <?php
 namespace App\DTO\Request;
 
-use OpenApi\Attributes as OA;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -23,9 +21,9 @@ class CreateOrderRequest
     #[Assert\Type('array')]
     public readonly array $items,
 
-    #[Assert\NotBlank([], "comment can't be blank")]
-    #[Assert\Type('string')]
-    public readonly string $comment
+    #[Assert\NotBlank([], "Comment can't be blank")]
+    #[Assert\Type('string', 'Comment value should be of type string.')]
+    public readonly ?string $comment
   ) {
   }
 

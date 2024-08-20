@@ -62,9 +62,6 @@ class OrdersController extends AbstractRestApiController
                 new OA\Schema(ref: '#/components/schemas/Order'),
                 new OA\Items(ref: '#/components/schemas/Order'),
                 new Model(type: Order::class),
-
-                // 0 => OA\Model(Order::class),
-                // 1 => new OA\Items(new Model(type: Order::class)),
             ],
         )
     )]
@@ -86,16 +83,6 @@ class OrdersController extends AbstractRestApiController
                 "x-total-items" => $total
             ]
         );
-
-        //$order = $orderRepository->getByIdJoinedToItems($id);
-
-        // return $this->json(
-        //     $orders,
-        //     Response::HTTP_OK,
-        //     [
-        //         "x-total-items" => $total
-        //     ]
-        // );
     }
 
     #[Route('/{id}', name: '_details')]
@@ -106,7 +93,7 @@ class OrdersController extends AbstractRestApiController
     )]
     // #[IsGranted('ROLE_USER', statusCode: 423, message: 'You are not allowed to access this page')]
     // public function getOrder(int $id, OrderRepository $orderRepository): Response //JsonResponse
-    public function getOrder(\App\Entity\Order $order): Response
+    public function getOrder(Order $order): Response
     {
         // $normalizers = array(new ObjectNormalizer());
         // $serializer = new Serializer($normalizers, $encoders);

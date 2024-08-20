@@ -18,7 +18,7 @@ class ExceptionListener
         $exception = $event->getThrowable();
 
         // TODO - check DEV environment for show details and Hide for Production
-        var_dump($exception->getMessage());
+        // var_dump($exception->getMessage());
 
         $headers = $exception->getHeaders();
         $headers['Content-Type'] = 'application/json';
