@@ -24,6 +24,8 @@ class AppFixtures extends Fixture
 
     // Default user
     $user = new User();
+    $user->setFirstName('User');
+    $user->setLastName('Example');
     $user->setEmail('user@example.com');
 
     // use: php bin/console security:hash-password

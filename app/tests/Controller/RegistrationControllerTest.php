@@ -1,24 +1,77 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-use GuzzleHttp\Client;
+use Symfony\Component\Console\Input\StringInput;
 
 class RegistrationController extends WebTestCase
 {
   // private string $apiHost = '';
   private string $apiUrl = '/api/v1/registration';
 
+  /**
+   * var \Doctrine\ORM\EntityManager
+   */
+  private $entityManager;
+  private $dbConnection;
+
+
+  // public function __construct(?string $name = null, array $data = [], $dataName = '')
+  // {
+  //   parent::__construct($name, $data, $dataName);
+
+  //   $kernel = self::bootKernel();
+
+  //   $this->entityManager = $kernel->getContainer()
+  //     ->get('doctrine')
+  //     ->getManager();
+
+  //     $this->dbConnection = $this->entityManager->getConnection();
+  // }
+
+  // protected function setUp(): void
+  // {
+  //   $this->dbConnection->executeQuery('TRUNCATE TABLE user');
+  // }
+
+
+  // public function __construct(?string $name = null, array $data = [], $dataName = '')
+  // {    
+  //   parent::__construct($name, $data, $dataName);
+  //   $kernel = self::bootKernel();
+
+  // }
+
+  protected static $application;
+
   protected function setUp(): void
   {
-    // $this->apiHost = $_SERVER['REST_API_HOST'];
-    // $this->apiUrl = "/registration";
+    // $this->runCommand('doctrine:fixtures:load -n --purge-with-truncate');
+    // self::runCommand('doctrine:database:create');
+    // self::runCommand('doctrine:schema:update --force');
+    // self::runCommand('doctrine:fixtures:load -n --purge-with-truncate');
+  }
 
-    // var_dump($_SERVER['REST_API_HOST']);
-    // var_dump($_SERVER['APP_ENV']);
-    // var_dump($_SERVER['DATABASE_URL']);
+  protected static function runCommand($command)
+  {
+    $command = sprintf('%s --quiet', $command);
+
+    return self::getApplication()->run(new StringInput($command));
+  }
+
+  protected static function getApplication()
+  {
+    if (null === self::$application) {
+      $client = static::createClient();
+      self::bootKernel();
+
+      self::$application = new Application($client->getKernel());
+      self::$application->setAutoExit(false);
+    }
+
+    return self::$application;
   }
 
   public function testRegistrationWithEmptyData(): void
@@ -51,7 +104,7 @@ class RegistrationController extends WebTestCase
 
     $client->request(
       'POST',
-      $this->apiUrl, 
+      $this->apiUrl,
       [],
       [],
       ['CONTENT_TYPE' => 'application/json'],
@@ -64,32 +117,6 @@ class RegistrationController extends WebTestCase
     $this->assertEquals('{"error":"This value should be of type string."}', $response);
   }
 
-  public function testRegistrationWithExistingEmail(): void
-  {
-    $client = static::createClient();
-
-    $data = [
-      'first_name' => 'John',
-      'last_name' => 'Smith',
-      'email' => 'test@example.com',
-      'password' => 'test123'
-    ];
-
-    $client->request(
-      'POST', 
-      $this->apiUrl,
-      [], 
-      [], 
-      ['CONTENT_TYPE' => 'application/json'],
-      json_encode($data)
-    );
-
-    $response = $client->getResponse()->getContent();
-
-    $this->assertResponseStatusCodeSame(409);
-    $this->assertEquals('{"error":"userAlreadyExists"}', $response);
-  }
-
   public function testSuccessRegistration(): void
   {
     $client = static::createClient();
@@ -97,15 +124,15 @@ class RegistrationController extends WebTestCase
     $data = [
       'first_name' => 'John',
       'last_name' => 'Smith',
-      'email' => 'test2@example.com',
+      'email' => 'test-success-reg@example.com',
       'password' => 'test123'
     ];
 
     $client->request(
-      'POST', 
+      'POST',
       $this->apiUrl,
-      [], 
-      [], 
+      [],
+      [],
       ['CONTENT_TYPE' => 'application/json'],
       json_encode($data)
     );
@@ -113,7 +140,47 @@ class RegistrationController extends WebTestCase
     $response = $client->getResponse()->getContent();
 
     $this->assertResponseStatusCodeSame(201);
-    $this->assertEquals('{"error":"userAlreadyExists"}', $response);
+    $this->assertEquals('{}', $response);
+  }
+
+  public function testRegistrationWithExistingEmail(): void
+  {
+    $client = static::createClient();
+
+    // create a new client
+    $data = [
+      'first_name' => 'John',
+      'last_name' => 'Smith',
+      'email' => 'test-already-exist@example.com',
+      'password' => 'test123'
+    ];
+
+    $client->request(
+      'POST',
+      $this->apiUrl,
+      [],
+      [],
+      ['CONTENT_TYPE' => 'application/json'],
+      json_encode($data)
+    );
+
+    // check success created
+    $this->assertResponseStatusCodeSame(201);
+
+    // try again
+    $client->request(
+      'POST',
+      $this->apiUrl,
+      [],
+      [],
+      ['CONTENT_TYPE' => 'application/json'],
+      json_encode($data)
+    );
+
+    $response = $client->getResponse()->getContent();
+
+    $this->assertResponseStatusCodeSame(409);
+    $this->assertEquals('{"error":"userAlreadyExist"}', $response);
   }
 
 }
