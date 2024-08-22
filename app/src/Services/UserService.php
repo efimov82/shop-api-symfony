@@ -5,6 +5,8 @@ namespace App\Services;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
+use App\Repository\UserRepository;
+
 use App\Entity\User;
 use App\Enums\Roles;
 
@@ -12,6 +14,7 @@ class UserService
 {
   public function __construct(
     private EntityManagerInterface $entityManager,
+    private UserRepository $userRepository,
     private UserPasswordHasherInterface $passwordHasher
   ) {
   }
@@ -35,5 +38,9 @@ class UserService
     $this->entityManager->flush();
 
     return $user;
+  }
+
+  public function getUserByEmail(string $email): User {
+    return $this->userRepository->findOneBy(["email"=> $email]);
   }
 }

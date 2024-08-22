@@ -53,7 +53,7 @@ class Order
 
     public function __construct()
     {
-        $this->OrderItems = new ArrayCollection();
+        // $this->OrderItems = new ArrayCollection();
         $this->orderItems = new ArrayCollection();
     }
 
@@ -141,6 +141,18 @@ class Order
     public function getOrderItems(): Collection
     {
         return $this->orderItems;
+    }
+
+    /**
+     * @param array $orderItems
+     */
+    public function setOrderItems(array $orderItems): static
+    {
+        foreach ($orderItems as $orderItem) {
+            $this->addOrderItem($orderItem);
+        }
+
+        return $this;
     }
 
     public function addOrderItem(OrderItem $orderItem): static

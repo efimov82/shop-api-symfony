@@ -17,9 +17,9 @@ class OrderItem
     #[Groups(['main'])]
     private ?int $id = null;
 
-    #[ORM\Column]
-    #[Groups(['main'])]
-    private ?int $order_id = null;
+    // #[ORM\Column]
+    // #[Groups(['main'])]
+    // private ?int $order_id = null;
 
     #[ORM\Column]
     #[Groups(['main'])]
@@ -33,9 +33,12 @@ class OrderItem
     #[ORM\JoinColumn(nullable: false)]
     private ?Order $OrderEntity = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Product $Product = null;
+    // #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+
+// Все переделать удалить и создать связи как в Order OneToMany 
+    // #[ORM\ManyToOne(inversedBy: 'orderItems')]
+    // #[ORM\JoinColumn(nullable: false)]
+    // private ?Product $Product = null;
 
     // #[ORM\ManyToOne(inversedBy: 'OrderItems')]
     // #[ORM\JoinColumn(nullable: false)]
@@ -43,8 +46,12 @@ class OrderItem
     // private ?Order $OrderObj = null;
     private int $totalCost;
 
+    #[ORM\ManyToOne(inversedBy: 'orderProductItems')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Product $product = null;
+
     public function getTotalCost(): float {
-        return $this->Product->getPrice() * $this->count;;
+        return $this->product->getPrice() * $this->count;;
     }
 
     public function getId(): ?int
@@ -59,17 +66,17 @@ class OrderItem
         return $this;
     }
 
-    public function getOrderId(): ?int
-    {
-        return $this->order_id;
-    }
+    // public function getOrderId(): ?int
+    // {
+    //     return $this->order_id;
+    // }
 
-    public function setOrderId(int $order_id): static
-    {
-        $this->order_id = $order_id;
+    // public function setOrderId(int $order_id): static
+    // {
+    //     $this->order_id = $order_id;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     public function getProductId(): ?int
     {
@@ -119,14 +126,26 @@ class OrderItem
         return $this;
     }
 
+    // public function getProduct(): ?Product
+    // {
+    //     return $this->Product;
+    // }
+
+    // public function setProduct(Product $Product): static
+    // {
+    //     $this->Product = $Product;
+
+    //     return $this;
+    // }
+
     public function getProduct(): ?Product
     {
-        return $this->Product;
+        return $this->product;
     }
 
-    public function setProduct(Product $Product): static
+    public function setProduct(?Product $product): static
     {
-        $this->Product = $Product;
+        $this->product = $product;
 
         return $this;
     }

@@ -23,7 +23,6 @@ class AbstractRestApiController extends AbstractController
     $normalizers = [new ObjectNormalizer(null, null, null, null, null, null, $defaultContext)];
     $serializer = new Serializer($normalizers, $encoders);
 
-    // TODO check user role + owner if need
     $jsonContent = $serializer->serialize($data, 'json', ['groups' => ['main']]);
 
     return $jsonContent;

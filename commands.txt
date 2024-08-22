@@ -1,0 +1,72 @@
+----------------------------------------------------------------
+# DB create
+php bin/console doctrine:database:create
+
+----------------------------------------------------------------
+# Create/Update Entity
+php bin/console make:entity <NAME>
+
+----------------------------------------------------------------
+# Create migration
+php bin/console make:migration
+
+or for synk
+php bin/console doctrine:migrations:diff
+
+----------------------------------------------------------------
+# Apply to DB
+php bin/console doctrine:migrations:migrate
+
+## For test DB
+php bin/console doctrine:migrations:migrate --env=test
+
+
+
+CACHE
+----------------------------------------------------------------
+bin/console cache:clear --env=test
+
+
+FIXTURES
+----------------------------------------------------------------
+# Load start data from src/DataFixtures/AppFixtures.php file
+php bin/console doctrine:fixtures:load
+
+## Test environment
+php bin/console doctrine:fixtures:load --env=test
+
+
+ROUTES
+----------------------------------------------------------------
+Routing
+php bin/console debug:router
+
+
+EVENTS
+----------------------------------------------------------------
+php bin/console debug:event-dispatcher kernel.exception
+
+
+SECURITY
+----------------------------------------------------------------
+Generate JWT keys
+php bin/console lexik:jwt:generate-keypair
+
+----------------------------------------------------------------
+# Genarate hash for password
+php bin/console security:hash-password
+
+
+----------------------------------------------------------------
+Get JWT token
+
+[POST] http://localhost:3000/api/login
+Body:
+Json:
+{
+  "username": "user@example.com",
+  "password": "user"
+}
+
+Access to closed API endpoints: send request with
+Autorization: Bearer <token>

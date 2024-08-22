@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\DTO\Request\CreateOrderRequest;
-use App\DTO\Request\OrderItemDto;
 use App\Entity\Order;
-use App\Entity\OrderItem;
 use App\Repository\OrderRepository;
+use App\Services\OrderService;
+use App\Services\UserService;
+
+use Lexik\Bundle\JWTAuthenticationBundle\Security\Authenticator\Token\JWTPostAuthenticationToken;
 use Nelmio\ApiDocBundle\Annotation\Model;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,17 +24,19 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-
 use Symfony\Component\Serializer\SerializerInterface;
+
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use OpenApi\Attributes as OA;
 
-#[Route('/api/v1/orders', name: 'orders_api')]
+#[Route('/api/v1/user/orders', name: 'orders_api')]
 #[OA\Tag(name: 'Orders API')]
 class OrdersController extends AbstractRestApiController
 {
     public function __construct(
+        private UserService $userService,
+        private OrderService $orderService,
         private SerializerInterface $serializer,
         private ValidatorInterface $validator
     ) {
@@ -95,6 +99,8 @@ class OrdersController extends AbstractRestApiController
     // public function getOrder(int $id, OrderRepository $orderRepository): Response //JsonResponse
     public function getOrder(Order $order): Response
     {
+        // TODO check user role + owner if need
+
         // $normalizers = array(new ObjectNormalizer());
         // $serializer = new Serializer($normalizers, $encoders);
         $encoders = [new JsonEncoder()];
@@ -136,7 +142,7 @@ class OrdersController extends AbstractRestApiController
     }
 
     #[Route('', name: '_create', methods: ['POST'])]
-    // #[IsGranted('ROLE_USER', statusCode: 423, message: 'You are not allowed to access this page')]
+    #[IsGranted('ROLE_USER', statusCode: 423, message: 'You are not allowed to this resource.')]
     #[OA\RequestBody(
         required: true,
         // content: new OA\JsonContent(
@@ -172,18 +178,34 @@ class OrdersController extends AbstractRestApiController
     {
         $token = $tokenStorage->getToken();
 
-        return $this->json([
-            'response' => 'ok',
-            'date' => $data->delivery_date,
-            'comment' => $data->comment,
-        ]);
-
-
-        // $item = new OrderItem();
-        // $item->setProduct();
-
         if ($token instanceof JWTPostAuthenticationToken) {
-            $user = $token->getUser();
+            $userFromToken = $token->getUser();
+            $user = $this->userService->getUserByEmail($userFromToken->getUserIdentifier());
+            $roles = $user->getRoles();
+        } else {
+            return $this->json(
+                [
+                    'error' => 'Token not provided or wrong'
+                ],
+                Response::HTTP_BAD_REQUEST
+            );
         }
+
+        // return $this->json([
+        //     'response' => 'ok',
+        //     'date' => $data->delivery_date,
+        //     'comment' => $data->comment,
+        // ]);
+
+        try {
+            $order = $this->orderService->create($data, $user);
+        } catch (\Exception $e) {
+            return $this->json([
+                'error' => 'catch error '//$e->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        
+        return new JsonResponse($order, Response::HTTP_CREATED);
     }
 }

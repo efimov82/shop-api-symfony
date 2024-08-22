@@ -11,13 +11,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CreateOrderRequest
 {
   public function __construct(
+
     #[Assert\NotBlank([], "date can't be blank")]
     public readonly \DateTime $delivery_date,
 
     // #[Assert\NotBlank]
     /**
      * @var OrderItemDto[]
-    **/
+     **/
     #[Assert\Type('array')]
     public readonly array $items,
 

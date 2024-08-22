@@ -12,14 +12,14 @@ class AppFixtures extends Fixture
   public function load(ObjectManager $manager)
   {
     $products = [
-      0 => ['name' => 'Tomato', 'description' => 'Tomato from Asia'],
-      1 => ['name' => 'Potato', 'description' => 'Potato from Belarus'],
-      2 => ['name' => 'Onion', 'description' => 'Onion from Japan'],
-      4 => ['name' => 'Apple', 'description' => 'Apple from China']
+      0 => ['id' => 1, 'name' => 'Tomato', 'description' => 'Tomato from Asia'],
+      1 => ['id' => 2, 'name' => 'Potato', 'description' => 'Potato from Belarus'],
+      2 => ['id' => 3, 'name' => 'Onion', 'description' => 'Onion from Japan'],
+      4 => ['id' => 4, 'name' => 'Apple', 'description' => 'Apple from China']
     ];
 
     foreach ($products as $id => $product) {
-      $this->createProduct($manager, $product['name'], $product['description']);
+      $this->createProduct($manager, $product['id'], $product['name'], $product['description']);
     }
 
     // Default user
@@ -38,10 +38,11 @@ class AppFixtures extends Fixture
   }
 
 
-  private function createProduct(ObjectManager $manager, string $name, string $description)
+  private function createProduct(ObjectManager $manager, int $id, string $name, string $description)
   {
     $product = new Product();
 
+    $product->setId($id);
     $product->setName($name);
     $product->setDescription($description);
     $product->setPrice(mt_rand(5, 50) / mt_rand(1, 10));

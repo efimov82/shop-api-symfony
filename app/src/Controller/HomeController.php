@@ -10,12 +10,12 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use OpenApi\Attributes as OA;
 
-#[Route('/api/v1', name: 'home_api')]
+#[Route('/api/v1/user', name: 'home_api')]
 #[OA\Tag(name: 'Home API')]
 class HomeController extends AbstractController
 {
   #[Route('/home', name: '_index')]
-  // #[IsGranted('ROLE_USER', statusCode: 423, message: 'You are not allowed to view this page')]
+  #[IsGranted('ROLE_USER', statusCode: 423, message: 'You are not allowed to view this page')]
   public function home(TokenStorageInterface $tokenStorage): JsonResponse
   {
     $token = $tokenStorage->getToken();

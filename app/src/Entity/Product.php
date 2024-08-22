@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 // use OpenApi\Annotations as OA;
 
@@ -25,6 +27,23 @@ class Product
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
+
+    /**
+     * @var Collection<int, OrderItem>
+     */
+    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'product', orphanRemoval: true)]
+    private Collection $orderProductItems;
+
+    public function __construct()
+    {
+        $this->orderProductItems = new ArrayCollection();
+    }
+
+    // /**
+    //  * @var Collection<int, OrderItem>
+    //  */
+    // #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'ProductItem', cascade: ['persist', 'remove'])]
+    // private Collection $orderItems;
 
     public function getId(): ?int
     {
@@ -82,6 +101,36 @@ class Product
     public function setImage(?string $image): static
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OrderItem>
+     */
+    public function getOrderProductItems(): Collection
+    {
+        return $this->orderProductItems;
+    }
+
+    public function addOrderItem(OrderItem $orderItem): static
+    {
+        if (!$this->orderProductItems->contains($orderItem)) {
+            $this->orderProductItems->add($orderItem);
+            $orderItem->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrderItem(OrderItem $orderItem): static
+    {
+        if ($this->orderProductItems->removeElement($orderItem)) {
+            // set the owning side to null (unless already changed)
+            if ($orderItem->getProduct() === $this) {
+                $orderItem->setProduct(null);
+            }
+        }
 
         return $this;
     }
