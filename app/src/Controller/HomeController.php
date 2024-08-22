@@ -15,7 +15,7 @@ use OpenApi\Attributes as OA;
 class HomeController extends AbstractController
 {
   #[Route('/home', name: '_index')]
-  #[IsGranted('ROLE_USER', statusCode: 423, message: 'You are not allowed to view this page')]
+  // #[IsGranted('ROLE_USER', statusCode: 423, message: 'You are not allowed to view this page')]
   public function home(TokenStorageInterface $tokenStorage): JsonResponse
   {
     $token = $tokenStorage->getToken();

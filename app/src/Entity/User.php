@@ -2,10 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+
+use Doctrine\ORM\Mapping as ORM;
+
+use App\Repository\UserRepository;
+use App\Enums\SerializeGroup;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -14,27 +18,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups([
+        SerializeGroup::FULL->value
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?string $email = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups([
+        // SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups([
+        'invisible'
+    ])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?string $first_name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?string $last_name = null;
 
     public function getId(): ?int
@@ -59,6 +85,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @see UserInterface
      */
+    #[Groups([
+        SerializeGroup::FULL->value
+    ])]
     public function getUserIdentifier(): string
     {
         return (string) $this->email;

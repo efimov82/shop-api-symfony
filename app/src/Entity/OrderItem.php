@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enums\SerializeGroup;
 use App\Repository\OrderItemRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,13 +14,22 @@ class OrderItem
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['main'])]
+    #[Groups([
+        SerializeGroup::FULL->value
+    ])]
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups(['main'])]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?int $count = null;
 
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private int $totalCost;
 
     #[ORM\ManyToOne(inversedBy: 'OrderItems')]
@@ -28,6 +38,10 @@ class OrderItem
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?Product $Product = null;
 
 

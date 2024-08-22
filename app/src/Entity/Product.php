@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use App\Enums\SerializeGroup;
 use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 // use OpenApi\Annotations as OA;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
@@ -14,18 +16,38 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?float $price = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?string $image = null;
 
     public function __construct()

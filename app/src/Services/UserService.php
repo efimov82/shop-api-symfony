@@ -6,7 +6,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 use App\Repository\UserRepository;
-
 use App\Entity\User;
 use App\Enums\Roles;
 
@@ -18,6 +17,16 @@ class UserService
     private UserPasswordHasherInterface $passwordHasher
   ) {
   }
+
+  /**
+   * Get list all users 
+   * 
+   * @return User[]
+   */
+  public function findAll(): array {
+    return $this->userRepository->findAll();
+  }
+
   public function create(object $data, Roles $role): User
   {
     $user = new User();

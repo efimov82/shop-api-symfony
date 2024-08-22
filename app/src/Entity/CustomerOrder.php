@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enums\SerializeGroup;
 use App\Repository\OrderRepository;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,7 +19,10 @@ class CustomerOrder
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['main'])]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -27,24 +31,41 @@ class CustomerOrder
     //     context: [DateTimeNormalizer::FORMAT_KEY => \DateTime::RFC3339_EXTENDED],
     //     groups: ['main'],
     // )]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?\DateTimeInterface $date_created = null;
 
     #[ORM\Column]
-    #[Groups(['main'])]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?int $status = null;
 
     #[ORM\Column]
-    #[Groups(['main'])]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?string $comment = '';
 
     /**
      * @var Collection<int, OrderItem>
      */
     #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'customerOrder', cascade: ["persist", "remove"])]
+    #[Groups([
+        SerializeGroup::FULL->value
+    ])]
     private Collection $OrderItems;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups([
+        SerializeGroup::MAIN->value,
+        SerializeGroup::FULL->value
+    ])]
     private ?User $User = null;
 
     public function __construct()
