@@ -27,7 +27,7 @@ class HomeControllerTest extends WebTestCase
         // $this->assertArrayHasKey('nickname', $data);
 
         // $crawler = $client->request('GET', 'http://localhost:3000/api/v1/home');
-        $client->request('GET', "/api/v1/home");
+        $client->request('GET', "/api/v1/user/home");
         $response = $client->getResponse()->getContent();
 
         $this->assertResponseIsSuccessful();

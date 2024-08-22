@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Input\StringInput;
 
-class RegistrationController extends WebTestCase
+class RegistrationControllerTest extends WebTestCase
 {
   // private string $apiHost = '';
   private string $apiUrl = '/api/v1/registration';
@@ -22,20 +22,14 @@ class RegistrationController extends WebTestCase
   // {
   //   parent::__construct($name, $data, $dataName);
 
-  //   $kernel = self::bootKernel();
+  // $kernel = self::bootKernel();
 
-  //   $this->entityManager = $kernel->getContainer()
-  //     ->get('doctrine')
-  //     ->getManager();
+  // $this->entityManager = $kernel->getContainer()
+  //   ->get('doctrine')
+  //   ->getManager();
 
-  //     $this->dbConnection = $this->entityManager->getConnection();
+  // $this->dbConnection = $this->entityManager->getConnection();
   // }
-
-  // protected function setUp(): void
-  // {
-  //   $this->dbConnection->executeQuery('TRUNCATE TABLE user');
-  // }
-
 
   // public function __construct(?string $name = null, array $data = [], $dataName = '')
   // {    
@@ -48,6 +42,14 @@ class RegistrationController extends WebTestCase
 
   protected function setUp(): void
   {
+    // static::getClient()->disableReboot();
+
+    // $this->entityManager = static::getContainer()->get('doctrine')->getManager();
+
+    // $this->dbConnection->executeQuery('TRUNCATE TABLE user');
+
+    // $this->entityManager->remove();
+
     // $this->runCommand('doctrine:fixtures:load -n --purge-with-truncate');
     // self::runCommand('doctrine:database:create');
     // self::runCommand('doctrine:schema:update --force');
