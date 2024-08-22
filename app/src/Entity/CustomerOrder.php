@@ -37,9 +37,19 @@ class CustomerOrder
     #[Groups(['main'])]
     private ?string $comment = '';
 
+    /**
+     * @var Collection<int, OrderItem>
+     */
+    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'customerOrder', cascade: ["persist", "remove"])]
+    private Collection $OrderItems;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $User = null;
+
     public function __construct()
     {
-
+        $this->OrderItems = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -78,38 +88,70 @@ class CustomerOrder
         return $this;
     }
 
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
 
-    // /**
-    //  * @param array $orderItems
-    //  */
-    // public function setOrderItems(array $orderItems): static
-    // {
-    //     foreach ($orderItems as $orderItem) {
-    //         $this->addOrderItem($orderItem);
-    //     }
+    public function setComment(string $comment): static
+    {
+        $this->comment = $comment;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
-    // public function addOrderItem(OrderItem $orderItem): static
-    // {
-    //     if (!$this->orderItems->contains($orderItem)) {
-    //         $this->orderItems->add($orderItem);
-    //         $orderItem->setOrderEntity($this);
-    //     }
 
-    //     return $this;
-    // }
+    /**
+     * @param array $orderItems
+     */
+    public function setOrderItems(array $orderItems): static
+    {
+        foreach ($orderItems as $orderItem) {
+            $this->addOrderItem($orderItem);
+        }
 
-    // public function removeOrderItem(OrderItem $orderItem): static
-    // {
-    //     if ($this->orderItems->removeElement($orderItem)) {
-    //         // set the owning side to null (unless already changed)
-    //         if ($orderItem->getOrderEntity() === $this) {
-    //             $orderItem->setOrderEntity(null);
-    //         }
-    //     }
+        return $this;
+    }
 
-    //     return $this;
-    // }
+    /**
+     * @return Collection<int, OrderItem>
+     */
+    public function getOrderItems(): Collection
+    {
+        return $this->OrderItems;
+    }
+
+    public function addOrderItem(OrderItem $orderItem): static
+    {
+        if (!$this->OrderItems->contains($orderItem)) {
+            $this->OrderItems->add($orderItem);
+            $orderItem->setCustomerOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrderItem(OrderItem $orderItem): static
+    {
+        if ($this->OrderItems->removeElement($orderItem)) {
+            // set the owning side to null (unless already changed)
+            if ($orderItem->getCustomerOrder() === $this) {
+                $orderItem->setCustomerOrder(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->User;
+    }
+
+    public function setUser(?User $User): static
+    {
+        $this->User = $User;
+
+        return $this;
+    }
 }

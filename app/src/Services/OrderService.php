@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Entity\CustomerOrder;
 use App\Exception\EntityNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -9,7 +10,6 @@ use App\DTO\Request\OrderItemDto;
 use App\DTO\Request\CreateOrderRequest;
 
 use App\Entity\OrderItem;
-use App\Entity\Order;
 use App\Entity\User;
 
 use App\Repository\OrderRepository;
@@ -28,30 +28,28 @@ class OrderService
   ) {
   }
 
-  public function create(CreateOrderRequest $data, User $user): Order|\Exception
+  public function create(CreateOrderRequest $data, User $user): CustomerOrder|\Exception
   {
-    $order = new Order(); // $this->orderRepository->create($data, $user);
+    $order = new CustomerOrder();
 
-    $order->setUserId($user->getId());
+    $order->setUser($user);
     $order->setDateCreated(new \DateTime())
+      ->setComment($data->comment)
       ->setStatus(OrderStatus::NEW ->value);
 
-
-    $this->entityManager->persist($order);
-    $this->entityManager->flush();
-
-    // var_dump($order);
-    // die();
-
+    // new version
     $items = $this->createOrderItems($data->items);
-
-    // var_dump($items);
-    // die();
-
     $order->setOrderItems($items);
+    //
 
     $this->entityManager->persist($order);
     $this->entityManager->flush();
+
+    // $items = $this->createOrderItems($data->items);
+    // $order->setOrderItems($items);
+
+    // $this->entityManager->persist($order);
+    // $this->entityManager->flush();
 
     return $order;
   }
@@ -69,9 +67,6 @@ class OrderService
     foreach ($data as $itemData) {
       $newOrderItem = $this->createOrderItem($itemData);
       $productIdNewItem = $newOrderItem->getProduct()->getId();
-
-      var_dump($productIdNewItem);
-      die();
 
       if (isset($res[$productIdNewItem])) {
         $existItem = $res[$productIdNewItem];
@@ -92,10 +87,6 @@ class OrderService
   {
     $product = $this->productRepository->findOneBy(['id' => $item->product_id]);
 
-    var_dump($product);
-    var_dump($item);
-    die();
-
     if (!$product) {
       throw new EntityNotFoundException(\sprintf("Product not found: id=%d", $item->product_id));
     }
@@ -109,5 +100,11 @@ class OrderService
       ->setCount($item->count);
 
     return $orderItem;
+  }
+
+  public function delete(CustomerOrder $order): void
+  {
+    $this->entityManager->remove($order);
+    $this->entityManager->flush();
   }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Order;
 use App\Repository\OrderItemRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -23,10 +22,18 @@ class OrderItem
 
     private int $totalCost;
 
+    #[ORM\ManyToOne(inversedBy: 'OrderItems')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?CustomerOrder $customerOrder = null;
 
-    public function getTotalCost(): float {
-        return 0;
-        // return $this->product->getPrice() * $this->count;;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Product $Product = null;
+
+
+    public function getTotalCost(): float
+    {
+        return $this->Product->getPrice() * $this->count;
     }
 
     public function getId(): ?int
@@ -49,6 +56,30 @@ class OrderItem
     public function setCount(int $count): static
     {
         $this->count = $count;
+
+        return $this;
+    }
+
+    public function getCustomerOrder(): ?CustomerOrder
+    {
+        return $this->customerOrder;
+    }
+
+    public function setCustomerOrder(?CustomerOrder $customerOrder): static
+    {
+        $this->customerOrder = $customerOrder;
+
+        return $this;
+    }
+
+    public function getProduct(): ?Product
+    {
+        return $this->Product;
+    }
+
+    public function setProduct(?Product $Product): static
+    {
+        $this->Product = $Product;
 
         return $this;
     }

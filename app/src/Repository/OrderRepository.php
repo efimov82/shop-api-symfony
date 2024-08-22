@@ -2,20 +2,19 @@
 
 namespace App\Repository;
 
-use App\Entity\Order;
+use App\Entity\CustomerOrder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
- * @extends ServiceEntityRepository<Order>
+ * @extends ServiceEntityRepository<CustomerOrder>
  */
 class OrderRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Order::class);
+        parent::__construct($registry, CustomerOrder::class);
     }
 
     public function getPaginatedOrders(int $page = 1, int $ordersPerPage = 10): Paginator
@@ -32,14 +31,14 @@ class OrderRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-    public function getByIdJoinedToItems(int $id): ?Order //array//
+    public function getByIdJoinedToItems(int $id): CustomerOrder
     {
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
             'SELECT o, i
-            FROM App\Entity\Order o
-            INNER JOIN o.OrderEntity i
+            FROM App\Entity\CustomerOrder o
+            INNER JOIN o.OrderItems i
             WHERE o.id = :id'
         )->setParameter('id', $id);
 

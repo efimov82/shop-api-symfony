@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\Request\CreateOrderRequest;
+use App\Entity\CustomerOrder;
 use App\Entity\Order;
 use App\Repository\OrderRepository;
 use App\Services\OrderService;
@@ -59,9 +60,7 @@ class OrdersController extends AbstractRestApiController
 
         content: new OA\JsonContent(
             type: 'array',
-            // items: new OA\Items(new Model(type: Order::class)),
             items: new OA\Items(ref: '#/components/schemas/Order'),
-            // items: new OA\Schema(ref: '#/components/schemas/Order'),
             example: [
                 new OA\Schema(ref: '#/components/schemas/Order'),
                 new OA\Items(ref: '#/components/schemas/Order'),
@@ -89,15 +88,14 @@ class OrdersController extends AbstractRestApiController
         );
     }
 
-    #[Route('/{id}', name: '_details')]
+    #[Route('/{id}', name: '_details', methods: ['GET'])]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Get order by ID.',
         content: new Model(type: Order::class)
     )]
     // #[IsGranted('ROLE_USER', statusCode: 423, message: 'You are not allowed to access this page')]
-    // public function getOrder(int $id, OrderRepository $orderRepository): Response //JsonResponse
-    public function getOrder(Order $order): Response
+    public function getOrder(CustomerOrder $order): Response
     {
         // TODO check user role + owner if need
 
@@ -174,7 +172,6 @@ class OrdersController extends AbstractRestApiController
         )
     )]
     public function createOrder(#[MapRequestPayload()] CreateOrderRequest $data, TokenStorageInterface $tokenStorage): JsonResponse //Order
-    //public function createOrder(Request $request, TokenStorageInterface $tokenStorage): Order
     {
         $token = $tokenStorage->getToken();
 
@@ -191,21 +188,33 @@ class OrdersController extends AbstractRestApiController
             );
         }
 
-        // return $this->json([
-        //     'response' => 'ok',
-        //     'date' => $data->delivery_date,
-        //     'comment' => $data->comment,
-        // ]);
-
         try {
             $order = $this->orderService->create($data, $user);
         } catch (\Exception $e) {
             return $this->json([
-                'error' => 'catch error '//$e->getMessage(),
+                'error' => $e->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
         }
-
         
-        return new JsonResponse($order, Response::HTTP_CREATED);
+        $resp = [
+            'id' => $order->getId(),
+            'status' => $order->getStatus()
+        ];
+
+        return new JsonResponse($resp, Response::HTTP_CREATED);
+    }
+
+    #[Route('/{id}', name: '_delete')]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Get order by ID.',
+        content: new Model(type: Order::class)
+    )]
+    // #[IsGranted('ROLE_ADMIN', statusCode: 423, message: 'You are not allowed to access this page')]
+    public function deleteOrder(CustomerOrder $order): Response
+    {
+        $this->orderService->delete($order);
+
+        return new Response(null, Response::HTTP_OK);
     }
 }
