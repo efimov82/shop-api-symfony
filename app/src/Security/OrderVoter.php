@@ -11,9 +11,6 @@ use App\Entity\User;
 
 class OrderVoter extends Voter
 {
-  const ROLE_ADMIN = 'ROLE_ADMIN';
-  const ROLE_USER = 'ROLE_USER';
-
   public function __construct(
     private Security $security,
   ) {
@@ -22,7 +19,7 @@ class OrderVoter extends Voter
   protected function supports(string $attribute, mixed $subject): bool
   {
     // if the attribute isn't one we support, return false
-    if (!in_array($attribute, ['view'])) {
+    if (!in_array($attribute, [ACTION_VIEW, ACTION_EDIT, ACTION_DELETE])) {
       return false;
     }
 
@@ -42,8 +39,6 @@ class OrderVoter extends Voter
       // the user must be logged in; if not, deny access
       return false;
     }
-
-    // var_dump($subject->getId());
 
     if ($this->security->isGranted('ROLE_ADMIN')) {
       return true;
