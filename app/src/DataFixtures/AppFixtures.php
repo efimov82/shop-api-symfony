@@ -31,8 +31,31 @@ class AppFixtures extends Fixture
     // use: php bin/console security:hash-password
     // password: user
     $user->setPassword('$2y$13$HynG6HO55eFSXOfSNhH3cuhZ5NtJ/srnEW6lJbDZjLGtgSis8Jqbm');
-    $user->setRoles(["ROLE_ADMIN", "ROLE_USER", "ROLE_MANAGER"]);
+    $user->setRoles(["ROLE_USER"]);
     $manager->persist($user);
+
+    // Admin
+    $admin = new User();
+    $admin->setFirstName('Admin');
+    $admin->setLastName('Admin');
+    $admin->setEmail('admin@example.com');
+
+    // password: admin
+    $admin->setPassword('$2y$13$QE3JbOUz6CYvKVwWxmo7J.BGVgxPeI6zXHtWnObTl3DmvEz9USYYe');
+    $admin->setRoles(["ROLE_ADMIN"]);
+    $manager->persist($admin);
+
+    // Manager
+    $m = new User();
+    $m->setFirstName('Manager');
+    $m->setLastName('Manager');
+    $m->setEmail('manager@example.com');
+
+    // password: manager
+    $m->setPassword('$2y$13$gFWDQFGI9pFlDzYQBQqDceYH2.x8d/DzxYtIQvUXDpaGw81Nixz5y');
+    $m->setRoles(["ROLE_MANAGER"]);
+    $manager->persist($m);
+
 
     $manager->flush();
   }

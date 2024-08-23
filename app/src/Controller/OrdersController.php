@@ -71,6 +71,7 @@ class OrdersController extends AbstractRestApiController
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 10);
 
+        // TODO: Check ROLE add filtering
         $orders = $orderRepository->getPaginatedOrders($page, $limit);
         $total = count($orderRepository->findAll());
 
@@ -91,11 +92,10 @@ class OrdersController extends AbstractRestApiController
         description: 'Get order by ID.',
         content: new Model(type: CustomerOrder::class)
     )]
-    // #[IsGranted('ROLE_USER', statusCode: 423, message: 'You are not allowed to access this page')]
+    #[IsGranted(ACTION_VIEW, 'order', statusCode: 423, message: 'You are not allowed to access this page')]
     public function getOrder(CustomerOrder $order): Response
     {
-        // TODO check user role + owner if need
-
+        // TODO check voter + add tests
         return $this->convertToJsonResponse($order, $this->serializer, [SerializeGroup::FULL->value], );
     }
 
@@ -103,21 +103,6 @@ class OrdersController extends AbstractRestApiController
     #[IsGranted('ROLE_USER', statusCode: 423, message: 'You are not allowed to this resource.')]
     #[OA\RequestBody(
         required: true,
-        // content: new OA\JsonContent(
-        //     type: 'object', //CreateOrderRequest::class, // CreateOrderRequest, //
-        //     example: [
-        //         "delivery_date" => "2024-08-19",
-        //         "comment" => "Order comment",
-        //         "products" => new OA\Items(ref: CreateOrderRequest::class),
-        //         // "items" => new OA\Items(new Model(type: CreateOrderRequest::class))
-        //         // "items" => new OQ\Items(
-        //         //     type: 'array',
-        //         //     items: new OA\Items(ref: new Model(type: Order::class)),   
-        //         // )
-        //     ]
-        // )
-        // content: new Model(type: CreateOrderRequest::class),
-
         content: new OA\JsonContent(
             type: 'object',
             ref: '#/components/schemas/CreateOrderRequest',
@@ -144,7 +129,7 @@ class OrdersController extends AbstractRestApiController
             $order = $this->orderService->create($data, $user);
         } catch (\Exception $e) {
             return $this->json([
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage(), // TODO check do we need replace message here
             ], Response::HTTP_BAD_REQUEST);
         }
 
