@@ -37,7 +37,8 @@ class OrdersController extends AbstractRestApiController
         private UserService $userService,
         private OrderService $orderService,
         private SerializerInterface $serializer,
-        private ValidatorInterface $validator
+        private ValidatorInterface $validator,
+        private TokenStorageInterface $tokenStorage,
     ) {
     }
 
@@ -66,13 +67,22 @@ class OrdersController extends AbstractRestApiController
             ],
         )
     )]
+    #[IsGranted('ROLE_USER', statusCode: 423, message: 'You are not allowed to access this page')]
     public function index(OrderRepository $orderRepository, Request $request): Response
     {
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 10);
+        $token = $this->tokenStorage->getToken();
 
-        // TODO: Check ROLE add filtering
-        $orders = $orderRepository->getPaginatedOrders($page, $limit);
+        try {
+            $user = $this->userService->getUserByToken($token);
+        } catch (\Exception $e) {
+            return $this->json([
+                'error' => 'Wrong token'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $orders = $this->orderService->getOrders($user, $page, $limit);
         $total = count($orderRepository->findAll());
 
         $additoinalHeaders = ["x-total-items" => $total];
@@ -92,7 +102,7 @@ class OrdersController extends AbstractRestApiController
         description: 'Get order by ID.',
         content: new Model(type: CustomerOrder::class)
     )]
-    #[IsGranted(ACTION_VIEW, 'order', statusCode: 423, message: 'You are not allowed to access this page')]
+    #[IsGranted(ACTION_VIEW_ORDER, 'order', statusCode: 423, message: 'You are not allowed to access this page')]
     public function getOrder(CustomerOrder $order): Response
     {
         // TODO check voter + add tests
@@ -108,9 +118,9 @@ class OrdersController extends AbstractRestApiController
             ref: '#/components/schemas/CreateOrderRequest',
         )
     )]
-    public function createOrder(#[MapRequestPayload()] CreateOrderRequest $data, TokenStorageInterface $tokenStorage): JsonResponse //Order
+    public function createOrder(#[MapRequestPayload()] CreateOrderRequest $data): JsonResponse //Order
     {
-        $token = $tokenStorage->getToken();
+        $token = $this->tokenStorage->getToken();
 
         if ($token instanceof JWTPostAuthenticationToken) {
             $userFromToken = $token->getUser();

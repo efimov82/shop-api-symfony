@@ -2,6 +2,6 @@
 
 namespace App\Constants;
 
-define('ACTION_VIEW', 'view');
-define('ACTION_EDIT', 'edit');
-define('ACTION_DELETE', 'delete');
+define('ACTION_VIEW_ORDER', 'view_order');
+define('ACTION_EDIT_ORDER', 'edit_order');
+define('ACTION_DELETE_ORDER', 'delete_order');

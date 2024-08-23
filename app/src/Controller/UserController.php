@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use OpenApi\Attributes as OA;
@@ -31,9 +32,34 @@ class UserController extends AbstractRestApiController
     return $this->convertToJsonResponse($users, $this->serializer);
   }
 
-  #[Route('/{id}', name: '_delails', methods: ['GET'])]
-  public function details(User $user, SerializerInterface $serializer): Response
+  #[Route('/profile', name: '_profile', methods: ['GET'])]
+  public function profile(TokenStorageInterface $tokenStorage): Response
+  {
+    $token = $tokenStorage->getToken();
+
+    try {
+      $user = $this->userService->getUserByToken($token);
+    } catch (\Exception $e) {
+      return $this->json(
+        [
+          'error' => 'Profile not found'
+        ],
+        Response::HTTP_BAD_REQUEST
+      );
+    }
+
+    return $this->convertToJsonResponse($user, $this->serializer, [SerializeGroup::FULL->value]);
+  }
+
+  #[Route('/details/{id}', name: '_delails', methods: ['GET'])]
+  public function details(User $user): Response
   {
     return $this->convertToJsonResponse($user, $this->serializer, [SerializeGroup::FULL->value]);
+  }
+
+
+  public function delete(User $user): Response
+  {
+    return new Response('NOT_IMPLEMENTE', Response::HTTP_NOT_IMPLEMENTED);
   }
 }

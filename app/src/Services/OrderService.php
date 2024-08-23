@@ -2,19 +2,21 @@
 
 namespace App\Services;
 
-use App\Entity\CustomerOrder;
-use App\Exception\EntityNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 use App\DTO\Request\OrderItemDto;
 use App\DTO\Request\CreateOrderRequest;
 
 use App\Entity\OrderItem;
 use App\Entity\User;
+use App\Entity\CustomerOrder;
 
 use App\Repository\OrderRepository;
 use App\Repository\OrderItemRepository;
 use App\Repository\ProductRepository;
+
+use App\Exception\EntityNotFoundException;
 
 use App\Enums\OrderStatus;
 
@@ -26,6 +28,18 @@ class OrderService
     private OrderItemRepository $orderItemRepository,
     private EntityManagerInterface $entityManager,
   ) {
+  }
+
+  public function getOrders(User $user, int $page, int $limit): Paginator
+  {
+    $filter = [];
+
+    // TODO check for manager role too
+    if (!$user->hasAdminRole()) {
+      $filter['user_id'] = $user->getId();
+    }
+
+    return $this->orderRepository->getPaginatedOrders($page, $limit, $filter);
   }
 
   public function create(CreateOrderRequest $data, User $user): CustomerOrder|\Exception

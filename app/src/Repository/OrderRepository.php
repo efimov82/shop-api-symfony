@@ -17,11 +17,44 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, CustomerOrder::class);
     }
 
-    public function getPaginatedOrders(int $page = 1, int $ordersPerPage = 10): Paginator
+    /**
+     * 
+     * 
+     * @param int $page
+     * @param int $ordersPerPage
+     * @param array $filters Support keys ['user_id'=> int]
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
+    public function getPaginatedOrders(int $page = 1, int $ordersPerPage = 10, array $filters = []): Paginator
     {
-        $query = $this->createQueryBuilder('o')
-            ->orderBy('o.id', 'ASC')
-            ->getQuery();
+        // $query = $this->createQueryBuilder('o')
+        //     ->join('App\Entity\User', 'u');
+
+        // if (isset($filters['user_id'])) {
+        //     $query->andWhere('u.id = :user_id')
+        //         ->setParameter('user_id', $filters['user_id']);
+        // }
+        // $query->orderBy('o.id', 'ASC')->getQuery();
+        $entityManager = $this->getEntityManager();
+
+        if (isset($filters['user_id'])) {
+            $query = $entityManager->createQuery(
+                'SELECT o, u
+                FROM App\Entity\CustomerOrder o
+                INNER JOIN o.User u
+                WHERE u.id = :user_id'
+            )->setParameter(
+                    'user_id',
+                    $filters['user_id']
+                );
+        } else {
+            $query = $entityManager->createQuery(
+                'SELECT o, u
+                FROM App\Entity\CustomerOrder o
+                INNER JOIN o.User u'
+            );
+        }
+
         $paginator = new Paginator($query);
 
         $paginator->getQuery()

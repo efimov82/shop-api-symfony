@@ -9,6 +9,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 use App\Repository\UserRepository;
+use App\Enums\Roles;
 use App\Enums\SerializeGroup;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -66,6 +67,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function hasAdminRole(): bool
+    {
+        return in_array(Roles::ADMIN->value, $this->getRoles());
+    }
+
+    public function hasManagerRole(): bool
+    {
+        return in_array(Roles::MANAGER->value, $this->getRoles());
+    }
+
+    public function hasUserRole(): bool
+    {
+        return in_array(Roles::USER->value, $this->getRoles());
     }
 
     public function getEmail(): ?string

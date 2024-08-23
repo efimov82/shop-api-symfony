@@ -19,7 +19,7 @@ class OrderVoter extends Voter
   protected function supports(string $attribute, mixed $subject): bool
   {
     // if the attribute isn't one we support, return false
-    if (!in_array($attribute, [ACTION_VIEW, ACTION_EDIT, ACTION_DELETE])) {
+    if (!in_array($attribute, [ACTION_VIEW_ORDER, ACTION_EDIT_ORDER, ACTION_DELETE_ORDER])) {
       return false;
     }
 
@@ -49,8 +49,8 @@ class OrderVoter extends Voter
     $order = $subject;
 
     return match ($attribute) {
-      ACTION_VIEW => $this->canView($order, $user),
-      ACTION_EDIT => $this->canEdit($order, $user),
+      ACTION_VIEW_ORDER => $this->canView($order, $user),
+      ACTION_EDIT_ORDER => $this->canEdit($order, $user),
       // TODO - check can resolve here???
       // 'delete' => $this->canDelete($order, $user);
       default => throw new \LogicException('This code should not be reached!')

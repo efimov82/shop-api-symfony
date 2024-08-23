@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use Lexik\Bundle\JWTAuthenticationBundle\Security\Authenticator\Token\JWTPostAuthenticationToken;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 use App\Repository\UserRepository;
@@ -23,7 +25,8 @@ class UserService
    * 
    * @return User[]
    */
-  public function findAll(): array {
+  public function findAll(): array
+  {
     return $this->userRepository->findAll();
   }
 
@@ -49,7 +52,21 @@ class UserService
     return $user;
   }
 
-  public function getUserByEmail(string $email): User {
-    return $this->userRepository->findOneBy(["email"=> $email]);
+  public function getUserByEmail(string $email): User
+  {
+    return $this->userRepository->findOneBy(["email" => $email]);
+  }
+
+  public function getUserByToken(TokenInterface|null $token): User|\Exception
+  {
+    if ($token instanceof JWTPostAuthenticationToken) {
+      $userFromToken = $token->getUser();
+
+      $user = $this->userRepository->findOneBy(["email" => $userFromToken->getUserIdentifier()]);
+
+      return $user;
+    } else {
+      throw new \Exception("Invalid token");
+    }
   }
 }
