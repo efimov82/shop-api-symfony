@@ -68,6 +68,12 @@ class CustomerOrder
     ])]
     private ?User $User = null;
 
+    #[ORM\ManyToOne(inversedBy: 'CustomerOrder')]
+    #[Groups([
+        SerializeGroup::FULL->value
+    ])]
+    private ?DeliveryAddress $deliveryAddress = null;
+
     public function __construct()
     {
         $this->OrderItems = new ArrayCollection();
@@ -172,6 +178,18 @@ class CustomerOrder
     public function setUser(?User $User): static
     {
         $this->User = $User;
+
+        return $this;
+    }
+
+    public function getDeliveryAddress(): ?DeliveryAddress
+    {
+        return $this->deliveryAddress;
+    }
+
+    public function setDeliveryAddress(?DeliveryAddress $deliveryAddress): static
+    {
+        $this->deliveryAddress = $deliveryAddress;
 
         return $this;
     }

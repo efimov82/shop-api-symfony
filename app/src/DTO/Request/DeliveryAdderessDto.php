@@ -15,9 +15,10 @@ class DeliveryAdderessDto
     public readonly string $street,
 
     #[Assert\NotBlank([], "House can't be blank")]
+    #[Assert\Type('string', 'House value should be of type string.')]
     public readonly string $house,
 
-    public readonly string $room = '',
+    public readonly ?string $room = '',
   ) {
   }
 }

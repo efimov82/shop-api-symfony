@@ -13,7 +13,13 @@ class DeliveryAddressService
 {
   public function __construct(
     private EntityManagerInterface $entityManager,
+    private DeliveryAddressRepository $deliveryAddressRepository,
   ) {
+  }
+
+  public function findById($id, User $user): DeliveryAddress|null
+  {
+    return $this->deliveryAddressRepository->findOneBy(['id'=>$id, 'user'=>$user]);
   }
 
   public function create(DeliveryAdderessDto $data, User $user): DeliveryAddress|\Exception

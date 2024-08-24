@@ -8,9 +8,10 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use App\DTO\Request\OrderItemDto;
 use App\DTO\Request\CreateOrderRequest;
 
+use App\Entity\DeliveryAddress;
+use App\Entity\CustomerOrder;
 use App\Entity\OrderItem;
 use App\Entity\User;
-use App\Entity\CustomerOrder;
 
 use App\Repository\OrderRepository;
 use App\Repository\OrderItemRepository;
@@ -27,6 +28,7 @@ class OrderService
     private ProductRepository $productRepository,
     private OrderItemRepository $orderItemRepository,
     private EntityManagerInterface $entityManager,
+    private DeliveryAddressService $deliveryAddressService,
   ) {
   }
 
@@ -51,19 +53,17 @@ class OrderService
       ->setComment($data->comment)
       ->setStatus(OrderStatus::NEW ->value);
 
-    // new version
     $items = $this->createOrderItems($data->items);
     $order->setOrderItems($items);
-    //
+
+    $deliveryAddress = $this->getDeliveryAddress($data, $user);
+    if ($deliveryAddress) {
+      $order->setDeliveryAddress($deliveryAddress);
+    }
 
     $this->entityManager->persist($order);
     $this->entityManager->flush();
 
-    // $items = $this->createOrderItems($data->items);
-    // $order->setOrderItems($items);
-
-    // $this->entityManager->persist($order);
-    // $this->entityManager->flush();
 
     return $order;
   }
@@ -114,6 +114,26 @@ class OrderService
       ->setCount($item->count);
 
     return $orderItem;
+  }
+
+  protected function getDeliveryAddress(CreateOrderRequest $data, User $user): DeliveryAddress|null|\Exception
+  {
+    
+    if ($data->delivery_address_id) {
+      $address = $this->deliveryAddressService->findById($data->delivery_address_id, $user);
+
+      if (!$address) {
+        throw new EntityNotFoundException(\sprintf("Delivery address id=%d not found", $data->delivery_address_id));
+      }
+
+      return $address;
+    } elseif ($data->delivery_address) {
+      $address = $this->deliveryAddressService->create($data->delivery_address, $user);
+
+      return $address;
+    } else {
+      return null;
+    }
   }
 
   public function delete(CustomerOrder $order): void

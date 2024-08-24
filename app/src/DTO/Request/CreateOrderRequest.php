@@ -22,9 +22,13 @@ class CreateOrderRequest
     #[Assert\Type('array')]
     public readonly array $items,
 
-    #[Assert\NotBlank([], "Comment can't be blank")]
-    #[Assert\Type('string', 'Comment value should be of type string.')]
-    public readonly ?string $comment
+    // #[Assert\NotBlank([], "Comment can't be blank")]
+    // #[Assert\Type('string', 'Comment value should be of type string.')]
+    public readonly ?string $comment,
+
+    public readonly ?int $delivery_address_id,
+
+    public readonly ?DeliveryAdderessDto $delivery_address,
   ) {
   }
 

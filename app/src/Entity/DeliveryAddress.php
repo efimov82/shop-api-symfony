@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -53,6 +55,17 @@ class DeliveryAddress
     #[ORM\ManyToOne(inversedBy: 'DeliveryAddress')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    /**
+     * @var Collection<int, CustomerOrder>
+     */
+    #[ORM\OneToMany(targetEntity: CustomerOrder::class, mappedBy: 'deliveryAddress')]
+    private Collection $CustomerOrder;
+
+    public function __construct()
+    {
+        $this->CustomerOrder = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -115,6 +128,36 @@ class DeliveryAddress
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CustomerOrder>
+     */
+    public function getCustomerOrder(): Collection
+    {
+        return $this->CustomerOrder;
+    }
+
+    public function addCustomerOrder(CustomerOrder $customerOrder): static
+    {
+        if (!$this->CustomerOrder->contains($customerOrder)) {
+            $this->CustomerOrder->add($customerOrder);
+            $customerOrder->setDeliveryAddress($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCustomerOrder(CustomerOrder $customerOrder): static
+    {
+        if ($this->CustomerOrder->removeElement($customerOrder)) {
+            // set the owning side to null (unless already changed)
+            if ($customerOrder->getDeliveryAddress() === $this) {
+                $customerOrder->setDeliveryAddress(null);
+            }
+        }
 
         return $this;
     }
