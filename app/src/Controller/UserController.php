@@ -94,7 +94,7 @@ class UserController extends AbstractRestApiController
       ref: '#/components/schemas/DeliveryAdderessDto',
     )
   )]
-  public function addAddess(#[MapRequestPayload(acceptFormat: 'json')] DeliveryAdderessDto $data): JsonResponse
+  public function addAddess(#[MapRequestPayload(acceptFormat: 'json')] DeliveryAdderessDto $data): Response
   {
     $token = $this->tokenStorage->getToken();
 

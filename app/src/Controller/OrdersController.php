@@ -83,7 +83,7 @@ class OrdersController extends AbstractRestApiController
         }
 
         $orders = $this->orderService->getOrders($user, $page, $limit);
-        $total = count($orderRepository->findAll());
+        $total = count($orderRepository->findAll()); // TODO add user filtering here
 
         $additoinalHeaders = ["x-total-items" => $total];
 
