@@ -16,7 +16,7 @@ class UserService
   public function __construct(
     private EntityManagerInterface $entityManager,
     private UserRepository $userRepository,
-    private UserPasswordHasherInterface $passwordHasher
+    private UserPasswordHasherInterface $passwordHasher,
   ) {
   }
 

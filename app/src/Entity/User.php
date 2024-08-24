@@ -6,6 +6,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use App\Repository\UserRepository;
@@ -63,6 +65,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         SerializeGroup::FULL->value
     ])]
     private ?string $last_name = null;
+
+    /**
+     * @var Collection<int, DeliveryAddress>
+     */
+    #[ORM\OneToMany(targetEntity: DeliveryAddress::class, mappedBy: 'user', orphanRemoval: true)]
+    #[Groups([
+        SerializeGroup::FULL->value
+    ])]
+    private Collection $DeliveryAddress;
+
+    public function __construct()
+    {
+        $this->DeliveryAddress = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -177,6 +193,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastName(string $last_name): static
     {
         $this->last_name = $last_name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DeliveryAddress>
+     */
+    public function getDeliveryAddress(): Collection
+    {
+        return $this->DeliveryAddress;
+    }
+
+    public function addDeliveryAddress(DeliveryAddress $deliveryAddress): static
+    {
+        if (!$this->DeliveryAddress->contains($deliveryAddress)) {
+            $this->DeliveryAddress->add($deliveryAddress);
+            $deliveryAddress->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDeliveryAddress(DeliveryAddress $deliveryAddress): static
+    {
+        if ($this->DeliveryAddress->removeElement($deliveryAddress)) {
+            // set the owning side to null (unless already changed)
+            if ($deliveryAddress->getUser() === $this) {
+                $deliveryAddress->setUser(null);
+            }
+        }
 
         return $this;
     }
