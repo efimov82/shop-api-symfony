@@ -11,6 +11,36 @@ cp .env.test .env
 ```php
 docker exec -it <container_name> bash
 ```
+После запуска контейнеров необходимо войти в контейнер php-cli
+и выполнить команду создания базы данных + структуры
+
+```
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
+```
+
+Далее залить тестовые данные командой
+```
+php bin/console doctrine:fixtures:load
+```
+
+Данная команда создаст 3 пользователей
+
+user@example.com
+Пароль: user
+
+admin@example.com
+Пароль: admin
+
+manager@example.com
+Пароль: manager
+
+Апи доступно по адресу
+http://localhost:3000
+
+Документация Swagger
+http://localhost:3000/api/doc
+
 
 Посмотреть запущенные контейнеры:
 ```php
